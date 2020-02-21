@@ -17,7 +17,7 @@ param (
 
     # Parameter help description
     [Parameter(Mandatory)]
-    [securestring]
+    [string]
     $TestAccountPassword,
 
     # Credential
@@ -73,9 +73,13 @@ foreach ($testUser in $testAccounts) {
 }
 
 # Set Account password and enable accounts for use
-foreach ($user in $testUser) {
-    Set-ADAccountPassword -Identity $user.samAccountName -NewPassword $TestAccountPassword -Credential $Credential
-    Enable-ADAccount $user.samAccountName -Credential $Credential
+foreach ($user in $testAccounts) {
+    Set-ADAccountPassword -Identity $user.samAccountName -Reset -NewPassword (ConvertTo-SecureString $TestAccountPassword -AsPlainText -Force) -Credential $Credential
+
+}
+
+foreach ($user in $testAccounts) {
+    Enable-ADAccount -Identity $user.samAccountName -Credential $Credential
 }
 
 Write-Host "`n`nThe following account have been created with a description of:`n$description" -ForegroundColor Green
